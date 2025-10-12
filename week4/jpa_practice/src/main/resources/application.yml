@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jpa_practice?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: hyeseong
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        use_sql_comments: true
