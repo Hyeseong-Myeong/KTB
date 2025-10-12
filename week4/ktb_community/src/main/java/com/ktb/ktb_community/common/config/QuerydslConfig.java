@@ -1,4 +1,4 @@
-package com.ktb.ktb_community.config;
+package com.ktb.ktb_community.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
