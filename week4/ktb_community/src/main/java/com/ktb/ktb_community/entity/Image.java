@@ -1,11 +1,13 @@
 package com.ktb.ktb_community.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Image {
 
