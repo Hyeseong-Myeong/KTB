@@ -1,6 +1,7 @@
 package com.ktb.ktb_community.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.sql.Timestamp;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Post {
 
@@ -36,10 +38,15 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-
+    @Builder
     public Post(String title, String content, User user) {
         this.title = title;
         this.content = content;
         this.user = user;
+    }
+
+    public void update(String title, String content){
+        this.title = title;
+        this.content = content;
     }
 }
