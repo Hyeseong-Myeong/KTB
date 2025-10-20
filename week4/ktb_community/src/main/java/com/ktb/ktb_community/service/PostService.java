@@ -1,14 +1,11 @@
 package com.ktb.ktb_community.service;
 
 import com.ktb.ktb_community.dto.*;
-import com.ktb.ktb_community.entity.Image;
 import com.ktb.ktb_community.entity.Post;
+import com.ktb.ktb_community.entity.PostImage;
 import com.ktb.ktb_community.entity.User;
 import com.ktb.ktb_community.exception.NoPermissionException;
-import com.ktb.ktb_community.repository.ImageRepository;
-import com.ktb.ktb_community.repository.PostLikeRepository;
-import com.ktb.ktb_community.repository.PostRepository;
-import com.ktb.ktb_community.repository.UserRepository;
+import com.ktb.ktb_community.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +24,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final ImageRepository imageRepository;
+    private final PostImageRepository postImageRepository;
     private final PostLikeRepository postLikeRepository;
 
     @Transactional
@@ -51,12 +48,13 @@ public class PostService {
     public PostResponseDto getPostById(Long postId) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("post not found"));
-        Integer likeCount = postLikeRepository.countByPostId(postId);
-        List<Image> images = imageRepository.findByPostId(postId);
+        Integer likeCount = postLikeRepository.countByPost_PostId(postId);
+        List<PostImage> postImageList = postImageRepository.findAllByPost_PostId(postId);
 
-        List<ImageResponseDto> dtos =  images.stream()
-                                             .map(ImageResponseDto::from)
-                                            .toList();
+        List<ImageResponseDto> dtos = postImageList.stream()
+                .map(PostImage::getImage)
+                .map(ImageResponseDto::from)
+                .toList();
 
         return PostResponseDto.from(post,likeCount, dtos);
     }

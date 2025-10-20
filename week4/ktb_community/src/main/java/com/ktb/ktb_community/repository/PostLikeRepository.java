@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
-    public Integer countByPostId(Long postId);
+    Integer countByPost_PostId(Long postId);
 }
