@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@IdClass(PostLikeId.class)
 public class PostLike {
 
     @Id

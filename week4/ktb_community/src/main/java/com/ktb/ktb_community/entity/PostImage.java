@@ -1,10 +1,13 @@
 package com.ktb.ktb_community.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor
+@IdClass(PostImageId.class)
 public class PostImage {
 
     @Id
