@@ -75,4 +75,26 @@ public class UserService {
 
         user.softDelete();
     }
+
+    public boolean checkEmail(String email) {
+
+        boolean result = userRepository.findByEmail(email).isEmpty();
+
+        if(result) {
+            return true;
+        }else{
+            throw new DuplicatedException("email", "duplicated");
+        }
+    }
+
+    public boolean checkNickname(String nickname) {
+
+        boolean result = userRepository.findByNickname(nickname).isEmpty();
+
+        if(result) {
+            return true;
+        } else{
+            throw new DuplicatedException("nickname", "duplicated");
+        }
+    }
 }

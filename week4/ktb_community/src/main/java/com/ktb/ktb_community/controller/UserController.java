@@ -61,6 +61,31 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/email")
+    public ResponseEntity<ApiResponse<Boolean>> emailExist(@RequestParam("email") String email) {
+
+        Boolean emailUsable = userService.checkEmail(email);
+
+        ApiResponse<Boolean> response = ApiResponse.success(
+                "email_check_success",
+                emailUsable
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/nickname")
+    public ResponseEntity<ApiResponse<Boolean>> nicknameExist(@RequestParam("nickname") String nickname) {
+
+        Boolean nicknameUsable = userService.checkNickname(nickname);
+        ApiResponse<Boolean> response = ApiResponse.success(
+                "nickname_check_success",
+                nicknameUsable
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
     @ExceptionHandler(DuplicatedException.class)
