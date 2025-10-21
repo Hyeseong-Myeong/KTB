@@ -31,7 +31,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponseDto>> getPost(@PathVariable Long postId, Principal principal) {
+    public ResponseEntity<ApiResponse<PostResponseDto>> getPost(@PathVariable("postId") Long postId, Principal principal) {
 
         PostResponseDto postResponseDto = postService.getPostById(postId);
 
@@ -44,7 +44,10 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PostPageResponseDto>> getPosts(@RequestParam Integer cursor, @RequestParam Integer size){
+    public ResponseEntity<ApiResponse<PostPageResponseDto>> getPosts(
+            @RequestParam(value = "cursor", required = false) Integer cursor,
+            @RequestParam(value = "size", required = false, defaultValue = "20") Integer size
+    ){
 
         PostPageResponseDto postPageResponseDto =  postService.getPosts(cursor, size);
 
