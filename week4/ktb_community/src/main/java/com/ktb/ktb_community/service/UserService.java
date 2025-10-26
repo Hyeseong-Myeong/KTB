@@ -5,6 +5,7 @@ import com.ktb.ktb_community.dto.UserResponseDto;
 import com.ktb.ktb_community.entity.User;
 import com.ktb.ktb_community.exception.DuplicatedException;
 import com.ktb.ktb_community.exception.NoPermissionException;
+import com.ktb.ktb_community.exception.NotFoundException;
 import com.ktb.ktb_community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,11 @@ public class UserService {
         return userRepository.save(user).getUserId();
     }
 
+    public UserResponseDto getUserInfo(String userEmail){
+
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new NotFoundException("user", "not found"));
+        return UserResponseDto.from(user);
+    }
 
     @Transactional
     public UserResponseDto updateUser(UserRequestDto userRequestDto, Principal principal) {

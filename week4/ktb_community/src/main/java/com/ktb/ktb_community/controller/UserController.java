@@ -35,6 +35,18 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUserInfo(Principal principal) {
+        String userEmail = principal.getName();
+        UserResponseDto userResponseDto = userService.getUserInfo(userEmail);
+
+        ApiResponse<UserResponseDto> response = ApiResponse.success(
+                "get_user_success",
+                userResponseDto
+        );
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/me")
     public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(@RequestBody UserRequestDto userRequestDto,
                                                         Principal principal) {

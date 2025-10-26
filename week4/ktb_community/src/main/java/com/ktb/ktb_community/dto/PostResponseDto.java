@@ -26,6 +26,9 @@ public class PostResponseDto {
 
     private List<ImageResponseDto> images;
 
+    private Boolean isAuthor;
+    private Integer commentCount;
+
     public PostResponseDto(Long postId, String title, String content, Timestamp createdAt, Timestamp updatedAt, Integer viewCount, UserResponseDto user) {
         this.postId = postId;
         this.title = title;
@@ -36,7 +39,7 @@ public class PostResponseDto {
         this.user = user;
     }
 
-    public PostResponseDto(Long postId, String title, String content, Timestamp createdAt, Timestamp updatedAt, Integer viewCount, UserResponseDto user, Integer likeCount, List<ImageResponseDto> images) {
+    public PostResponseDto(Long postId, String title, String content, Timestamp createdAt, Timestamp updatedAt, Integer viewCount, UserResponseDto user, Integer likeCount, List<ImageResponseDto> images, Boolean isAuthor, Integer commentCount) {
         this.postId = postId;
         this.title = title;
         this.content = content;
@@ -47,6 +50,9 @@ public class PostResponseDto {
 
         this.likeCount = likeCount;
         this.images = images;
+
+        this.isAuthor = isAuthor;
+        this.commentCount = commentCount;
     }
 
     public static PostResponseDto from(Post post) {
@@ -61,7 +67,7 @@ public class PostResponseDto {
         );
     }
 
-    public static PostResponseDto from(Post post, Integer likeCount, List<ImageResponseDto> images) {
+    public static PostResponseDto from(Post post, Integer likeCount, List<ImageResponseDto> images, Boolean isAuthor, Integer commentCount) {
         return new PostResponseDto(
                 post.getPostId(),
                 post.getTitle(),
@@ -71,7 +77,9 @@ public class PostResponseDto {
                 post.getViewCount(),
                 UserResponseDto.from(post.getUser()),
                 likeCount,
-                images
+                images,
+                isAuthor,
+                commentCount
         );
     }
 }
