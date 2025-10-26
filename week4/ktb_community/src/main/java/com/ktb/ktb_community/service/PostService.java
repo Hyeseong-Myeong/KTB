@@ -3,6 +3,7 @@ package com.ktb.ktb_community.service;
 import com.ktb.ktb_community.dto.*;
 import com.ktb.ktb_community.entity.Post;
 import com.ktb.ktb_community.entity.PostImage;
+import com.ktb.ktb_community.entity.PostLike;
 import com.ktb.ktb_community.entity.User;
 import com.ktb.ktb_community.exception.NoPermissionException;
 import com.ktb.ktb_community.repository.*;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -45,7 +47,7 @@ public class PostService {
         Long postId = postRepository.save(post).getPostId();
         Integer commentCount = commentRepository.countByPost_PostId(postId);
 
-        return PostResponseDto.from(post,0, images, Boolean.TRUE, commentCount);
+        return PostResponseDto.from(post,0, false, images, Boolean.TRUE, commentCount);
     }
 
     @Transactional
@@ -54,6 +56,8 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("post not found"));
         Integer likeCount = postLikeRepository.countByPost_PostId(postId);
         List<PostImage> postImageList = postImageRepository.findAllByPost_PostId(postId);
+        Optional<PostLike> optionalPostLike =  postLikeRepository.findByPost_PostIdAndUser_email(postId, email);
+        Boolean isLiked = false;
 
         List<ImageResponseDto> dtos = postImageList.stream()
                 .map(PostImage::getImage)
@@ -68,7 +72,11 @@ public class PostService {
         Integer commentCount = commentRepository.countByPost_PostId(postId);
 
 
-        return PostResponseDto.from(post, likeCount, dtos, isAuthor, commentCount);
+        if(optionalPostLike.isPresent()) {
+            isLiked = true;
+        }
+
+        return PostResponseDto.from(post, likeCount, isLiked, dtos, isAuthor, commentCount);
     }
 
     public PostPageResponseDto getPosts(Integer cursor, int size){
@@ -85,7 +93,8 @@ public class PostService {
                     Integer likeCount = postLikeRepository.countByPost_PostId(post.getPostId());
                     Integer commentCount = commentRepository.countByPost_PostId(post.getPostId());
 
-                    return PostResponseDto.from(post, likeCount, null, null, commentCount);
+
+                    return PostResponseDto.from(post, likeCount, null, null, null, commentCount);
                 })
                 .toList();
 

@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "api/users/nickname",
                                 "/api/auth"
                         ).permitAll()
+                        .requestMatchers("/terms").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class);
