@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class PostLikeResponseDto {
 
-    Integer PostLikeCount;
+    Integer likeCount;
     Boolean isLiked;
 
-    public PostLikeResponseDto(Integer PostLikeCount, Boolean isLiked) {
-        this.PostLikeCount = PostLikeCount;
+    public PostLikeResponseDto(Integer likeCount, Boolean isLiked) {
+        this.likeCount = likeCount;
         this.isLiked = isLiked;
     }
 }

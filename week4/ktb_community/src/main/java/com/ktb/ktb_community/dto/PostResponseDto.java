@@ -22,7 +22,7 @@ public class PostResponseDto {
     private UserResponseDto user;
 
     private Integer likeCount;
-    private Boolean liked;
+    private Boolean isLiked;
 
     private List<ImageResponseDto> images;
 
@@ -39,7 +39,7 @@ public class PostResponseDto {
         this.user = user;
     }
 
-    public PostResponseDto(Long postId, String title, String content, Timestamp createdAt, Timestamp updatedAt, Integer viewCount, UserResponseDto user, Integer likeCount, List<ImageResponseDto> images, Boolean isAuthor, Integer commentCount) {
+    public PostResponseDto(Long postId, String title, String content, Timestamp createdAt, Timestamp updatedAt, Integer viewCount, UserResponseDto user, Integer likeCount, Boolean isLiked, List<ImageResponseDto> images, Boolean isAuthor, Integer commentCount) {
         this.postId = postId;
         this.title = title;
         this.content = content;
@@ -49,6 +49,8 @@ public class PostResponseDto {
         this.user = user;
 
         this.likeCount = likeCount;
+        this.isLiked = isLiked;
+
         this.images = images;
 
         this.isAuthor = isAuthor;
@@ -67,7 +69,7 @@ public class PostResponseDto {
         );
     }
 
-    public static PostResponseDto from(Post post, Integer likeCount, List<ImageResponseDto> images, Boolean isAuthor, Integer commentCount) {
+    public static PostResponseDto from(Post post, Integer likeCount, Boolean isLiked, List<ImageResponseDto> images, Boolean isAuthor, Integer commentCount) {
         return new PostResponseDto(
                 post.getPostId(),
                 post.getTitle(),
@@ -77,6 +79,7 @@ public class PostResponseDto {
                 post.getViewCount(),
                 UserResponseDto.from(post.getUser()),
                 likeCount,
+                isLiked,
                 images,
                 isAuthor,
                 commentCount
