@@ -20,11 +20,11 @@ public class QComment extends EntityPathBase<Comment> {
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QComment comment1 = new QComment("comment1");
-
-    public final StringPath comment = createString("comment");
+    public static final QComment comment = new QComment("comment");
 
     public final NumberPath<Long> commentId = createNumber("commentId", Long.class);
+
+    public final StringPath content = createString("content");
 
     public final DateTimePath<java.sql.Timestamp> createdAt = createDateTime("createdAt", java.sql.Timestamp.class);
 

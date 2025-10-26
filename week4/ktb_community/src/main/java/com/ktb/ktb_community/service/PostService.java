@@ -7,6 +7,7 @@ import com.ktb.ktb_community.entity.User;
 import com.ktb.ktb_community.exception.NoPermissionException;
 import com.ktb.ktb_community.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,6 +28,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostImageRepository postImageRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public PostResponseDto create(PostRequestDto requestDto, String email) {
@@ -40,12 +43,13 @@ public class PostService {
                 .build();
 
         Long postId = postRepository.save(post).getPostId();
+        Integer commentCount = commentRepository.countByPost_PostId(postId);
 
-
-        return PostResponseDto.from(post,0, images);
+        return PostResponseDto.from(post,0, images, Boolean.TRUE, commentCount);
     }
 
-    public PostResponseDto getPostById(Long postId) {
+    @Transactional
+    public PostResponseDto getPostById(Long postId, String email) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("post not found"));
         Integer likeCount = postLikeRepository.countByPost_PostId(postId);
@@ -56,19 +60,33 @@ public class PostService {
                 .map(ImageResponseDto::from)
                 .toList();
 
-        return PostResponseDto.from(post,likeCount, dtos);
+        Boolean isAuthor = Boolean.FALSE;
+        if(post.getUser().getEmail().equals(email)) {
+            isAuthor = Boolean.TRUE;
+        }
+        post.incrementViewCount();
+        Integer commentCount = commentRepository.countByPost_PostId(postId);
+
+
+        return PostResponseDto.from(post, likeCount, dtos, isAuthor, commentCount);
     }
 
     public PostPageResponseDto getPosts(Integer cursor, int size){
 
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "postId"));
 
+
         Slice<Post> postSlice = (cursor == null)
                 ? postRepository.findAllByOrderByPostIdDesc(pageable)
                 : postRepository.findByPostIdLessThanOrderByPostIdDesc(Long.valueOf(cursor), pageable);
 
         List<PostResponseDto> postresponseDtoList = postSlice.getContent().stream()
-                .map(PostResponseDto::from)
+                .map(post->{
+                    Integer likeCount = postLikeRepository.countByPost_PostId(post.getPostId());
+                    Integer commentCount = commentRepository.countByPost_PostId(post.getPostId());
+
+                    return PostResponseDto.from(post, likeCount, null, null, commentCount);
+                })
                 .toList();
 
         Long nextCursor = null;

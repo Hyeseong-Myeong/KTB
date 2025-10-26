@@ -33,7 +33,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostResponseDto>> getPost(@PathVariable("postId") Long postId, Principal principal) {
 
-        PostResponseDto postResponseDto = postService.getPostById(postId);
+        PostResponseDto postResponseDto = postService.getPostById(postId,principal.getName());
 
         ApiResponse<PostResponseDto> response = ApiResponse.success(
                 "get_post_success",
@@ -56,6 +56,21 @@ public class PostController {
                 postPageResponseDto
         );
 
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(
+            @PathVariable("postId") Long postId,
+            @RequestBody PostRequestDto postRequestDto,
+            Principal principal
+    ) {
+
+        PostResponseDto postResponseDto = postService.updatePost(postRequestDto, postId, principal.getName());
+        ApiResponse<PostResponseDto> response = ApiResponse.success(
+                "update_post_success",
+                postResponseDto
+        );
         return ResponseEntity.ok(response);
     }
 

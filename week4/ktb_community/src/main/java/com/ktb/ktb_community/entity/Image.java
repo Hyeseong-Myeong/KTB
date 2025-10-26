@@ -3,6 +3,7 @@ package com.ktb.ktb_community.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
@@ -17,6 +18,7 @@ public class Image {
 
     private String imageUrl;
 
+    @CreationTimestamp
     private Timestamp createdAt;
 
     @ManyToOne
