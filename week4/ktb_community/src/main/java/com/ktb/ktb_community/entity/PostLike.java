@@ -1,6 +1,7 @@
 package com.ktb.ktb_community.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -18,6 +19,7 @@ public class PostLike {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Builder
     public PostLike(User user, Post post) {
         this.user = user;
         this.post = post;
