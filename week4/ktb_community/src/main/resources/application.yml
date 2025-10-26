@@ -24,3 +24,14 @@ jwt:
     key: ${JWT_KEY}
   accessTokenValidityInMs: ${AT_MS}
   refreshTokenValidityInMs: ${RT_MS}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_BUCKET_NAME}
+    stack.auto: false
+    region:
+      static: ${AWS_BUCKET_REGION}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
