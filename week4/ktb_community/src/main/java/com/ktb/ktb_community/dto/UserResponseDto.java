@@ -1,6 +1,7 @@
 package com.ktb.ktb_community.dto;
 
 import com.ktb.ktb_community.entity.User;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
@@ -12,6 +13,7 @@ public class UserResponseDto {
 
     private String profileImageUrl;
 
+    @Builder
     public UserResponseDto(String email, String nickname, String profileImageUrl) {
         this.email = email;
         this.nickname = nickname;

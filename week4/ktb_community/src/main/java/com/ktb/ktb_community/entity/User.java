@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -17,7 +15,7 @@ import java.util.Collections;
 @Entity
 @Getter
 @NoArgsConstructor
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,43 +63,5 @@ public class User implements UserDetails {
 
     public void softDelete() {
         this.deletedAt = Timestamp.valueOf(LocalDateTime.now());
-    }
-
-
-    //Spring Security
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.deletedAt == null;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 현재는 단일 권한을 가정. 추후 역할(Role)에 따라 변경 가능
-        return Collections.emptyList();
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
     }
 }

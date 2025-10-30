@@ -6,18 +6,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class CookieUtil {
 
-    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from("refreshToken", refreshToken)
+    public ResponseCookie createSessionIdCookie(String SessionId) {
+        return ResponseCookie.from("sessionId", SessionId)
                 .httpOnly(true)
                 .secure(true)
-                .path("/api/auth/refresh")
-                .maxAge(60 * 60 * 24 * 7)
+                .path("/api")
+                .maxAge(900)
                 .sameSite("Lax")
                 .build();
     }
 
-    public ResponseCookie clearRefreshTokenCookie() {
-        return ResponseCookie.from("refreshToken", null)
+    public ResponseCookie clearSessionIdCookie() {
+        return ResponseCookie.from("sessionId", null)
                 .maxAge(0)
                 .path("/")
                 .build();
