@@ -1,5 +1,6 @@
 package com.ktb.ktb_community.common.Security;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -11,12 +12,13 @@ import org.springframework.data.redis.core.RedisHash;
 public class RefreshToken {
 
     @Id
-    private String email;
+    private Long userId;
 
     private String token;
 
-    public RefreshToken(String email, String token) {
-        this.email = email;
+    @Builder
+    public RefreshToken(Long userId, String token) {
+        this.userId = userId;
         this.token = token;
     }
 }

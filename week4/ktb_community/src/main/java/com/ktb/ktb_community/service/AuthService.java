@@ -1,48 +1,83 @@
 package com.ktb.ktb_community.service;
 
-import com.ktb.ktb_community.common.Security.JwtProvider;
-import com.ktb.ktb_community.common.Security.LoginRequestDto;
-import com.ktb.ktb_community.common.Security.LoginResponseDto;
-import com.ktb.ktb_community.common.Security.RefreshToken;
+import com.ktb.ktb_community.common.Security.*;
+import com.ktb.ktb_community.dto.UserResponseDto;
+import com.ktb.ktb_community.entity.User;
+import com.ktb.ktb_community.exception.NoPermissionException;
+import com.ktb.ktb_community.exception.NotFoundException;
 import com.ktb.ktb_community.repository.RefreshTokenRepository;
+import com.ktb.ktb_community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public LoginResponseDto login(LoginRequestDto loginRequest) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new NotFoundException("email", "email_not_found"));
 
-        String email = authentication.getName();
+        if(!checkPassword(user, loginRequest.getPassword())) {
+            throw new NoPermissionException("auth", "no_permission");
+        }
 
-        String accessToken = jwtProvider.createAccessToken(email);
-        String refreshToken = jwtProvider.createRefreshToken(email);
+        refreshTokenRepository.deleteById(user.getUserId());
 
-        refreshTokenRepository.save(new RefreshToken(email, refreshToken));
+        TokenResponse tokenResponse = generateAndSaveToken(user);
 
-        return new LoginResponseDto(accessToken, refreshToken);
+        return new LoginResponseDto(tokenResponse.accessToken, tokenResponse.refreshToken, UserResponseDto.from(user));
     }
 
-    public void logout(String email) {
+    public LoginResponseDto refreshToken(String refreshToken) {
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(email)
+        var parsedToken = jwtProvider.parseToken(refreshToken);
+
+        RefreshToken entity = refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new NoPermissionException("token", "token_not_found"));
+
+        Long userId = entity.getUserId();
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user", "user_not_found"));
+
+        String newAccessToken = jwtProvider.createAccessToken(user.getUserId());
+        return new LoginResponseDto(newAccessToken, refreshToken, UserResponseDto.from(user));
+    }
+
+    public void logout(Long userId) {
+
+        RefreshToken refreshToken = refreshTokenRepository.findById(userId)
                 .orElse(null);
 
         if (refreshToken != null) {
-            refreshTokenRepository.deleteById(email);
+            refreshTokenRepository.deleteById(userId);
         }
     }
+
+
+    private TokenResponse generateAndSaveToken(User user) {
+
+        String accessTokenString = jwtProvider.createAccessToken(user.getUserId());
+        String refreshTokenString = jwtProvider.createRefreshToken(user.getUserId());
+
+        RefreshToken refreshToken = new RefreshToken(user.getUserId(), refreshTokenString);
+        refreshTokenRepository.save(refreshToken);
+
+        return new TokenResponse(accessTokenString, refreshTokenString);
+    }
+
+    private boolean checkPassword(User user, String rawPassword){
+
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    public record TokenResponse(String accessToken, String refreshToken) {}
 
 }

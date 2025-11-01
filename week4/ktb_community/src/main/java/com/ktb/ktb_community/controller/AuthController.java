@@ -12,8 +12,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -31,7 +29,7 @@ public class AuthController {
 
         ApiResponse<LoginSuccessResponseDto> successResponse = ApiResponse.success(
                 "login_successful",
-                new LoginSuccessResponseDto(responseDto.getAccessToken())
+                new LoginSuccessResponseDto(responseDto.getAccessToken(), responseDto.getUser())
         );
 
         return ResponseEntity.ok()
@@ -39,12 +37,23 @@ public class AuthController {
                 .body(successResponse);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<LoginSuccessResponseDto>> refresh(@CookieValue(value = "refreshToken") String refreshToken) {
+
+        LoginResponseDto responseDto = authService.refreshToken(refreshToken);
+
+        ApiResponse<LoginSuccessResponseDto> successResponse = ApiResponse.success(
+                "refresh_successful",
+                new LoginSuccessResponseDto(responseDto.getAccessToken(), responseDto.getUser())
+        );
+
+        return ResponseEntity.ok().body(successResponse);
+    }
+
     @DeleteMapping
-    public ResponseEntity<Void> logout(Principal principal) {
+    public ResponseEntity<Void> logout(@RequestAttribute(value = "userId") Long userId) {
 
-        String userEmail = principal.getName();
-
-        authService.logout(userEmail);
+        authService.logout(userId);
         ResponseCookie clearCookie = cookieUtil.clearRefreshTokenCookie();
 
         return ResponseEntity.noContent()

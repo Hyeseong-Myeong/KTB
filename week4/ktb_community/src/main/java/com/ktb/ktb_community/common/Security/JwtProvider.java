@@ -1,8 +1,6 @@
 package com.ktb.ktb_community.common.Security;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -34,28 +32,31 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createAccessToken(String email) {
-        return createToken(email, accessTokenValidityInMs);
+    public String createAccessToken(Long userId) {
+        return createToken(userId, accessTokenValidityInMs);
     }
 
-    public String createRefreshToken(String email) {
-        return createToken(email, refreshTokenValidityInMs);
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenValidityInMs);
     }
 
-    private String createToken(String email, long validityInMs) {
+    private String createToken(Long userId, long validityInMs) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMs);
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userId.toString())
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    public Jws<Claims> parseToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+    }
 
-    public String getEmailFromToken(String token) {
+    public String getUserIdFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
