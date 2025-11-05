@@ -34,28 +34,27 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createAccessToken(String email) {
-        return createToken(email, accessTokenValidityInMs);
+    public String createAccessToken(String userId) {
+        return createToken(userId, accessTokenValidityInMs);
     }
 
-    public String createRefreshToken(String email) {
-        return createToken(email, refreshTokenValidityInMs);
+    public String createRefreshToken(String userId) {
+        return createToken(userId, refreshTokenValidityInMs);
     }
 
-    private String createToken(String email, long validityInMs) {
+    private String createToken(String userId, long validityInMs) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMs);
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userId)
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-
-    public String getEmailFromToken(String token) {
+    public String getUserIdFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

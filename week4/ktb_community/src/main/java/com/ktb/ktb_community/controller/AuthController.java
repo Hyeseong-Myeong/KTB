@@ -23,9 +23,9 @@ public class AuthController {
     private final CookieUtil cookieUtil;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<LoginSuccessResponseDto>> login(@RequestBody LoginRequestDto loginRequest) {
+    public ResponseEntity<ApiResponse<LoginSuccessResponseDto>> login(@RequestBody LoginRequestDto loginRequestDto){
 
-        LoginResponseDto responseDto = authService.login(loginRequest);
+        LoginResponseDto responseDto = authService.login(loginRequestDto);
 
         ResponseCookie refreshTokenCookie = cookieUtil.createRefreshTokenCookie(responseDto.getRefreshToken());
 
@@ -37,6 +37,21 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .body(successResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<LoginSuccessResponseDto>> refresh(
+            @CookieValue("refreshToken") String refreshToken
+    ){
+
+        String accessToken =  authService.reissueAccessToken(refreshToken).getAccessToken();
+
+        ApiResponse<LoginSuccessResponseDto> successResponse = ApiResponse.success(
+                "refresh_successful",
+                new LoginSuccessResponseDto(accessToken)
+        );
+
+        return ResponseEntity.ok(successResponse);
     }
 
     @DeleteMapping
