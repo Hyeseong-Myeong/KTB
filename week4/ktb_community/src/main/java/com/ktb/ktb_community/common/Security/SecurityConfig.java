@@ -41,8 +41,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users",
                                 "/api/users/email",
-                                "api/users/nickname",
-                                "/api/auth"
+                                "/api/users/nickname",
+                                "/api/auth",
+                                "/api/auth/refresh"
                         ).permitAll()
                         .requestMatchers("/terms").permitAll()
                         .anyRequest().authenticated())

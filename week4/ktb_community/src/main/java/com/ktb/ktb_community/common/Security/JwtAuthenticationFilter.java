@@ -28,11 +28,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtProvider.validateToken(token)) {
-            String email = jwtProvider.getEmailFromToken(token);
+            String userId = jwtProvider.getUserIdFromToken(token);
             // DB에서 UserDetails를 가져오지 않고, 토큰 정보만으로 인증 객체를 생성할 수도 있습니다.
             // 이 경우, User의 role 같은 정보도 토큰에 포함시켜야 합니다.
             Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
